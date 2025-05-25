@@ -28,8 +28,8 @@ A beautiful, modern desktop note-taking application built with Electron, React, 
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
-cd my-app
+git clone https://github.com/kelcho-spense/purple-notetaker-electron
+cd purple-notetaker-electron
 ```
 
 1. Install dependencies:
@@ -46,13 +46,13 @@ pnpm start
 
 ## 🛠️ Development Scripts
 
-| Script | Description |
-|--------|-------------|
-| `pnpm start` | Start the app in development mode |
-| `pnpm package` | Package the app for distribution |
-| `pnpm make` | Create distributable packages |
-| `pnpm publish` | Publish the app |
-| `pnpm lint` | Run ESLint to check code quality |
+| Script           | Description                       |
+| ---------------- | --------------------------------- |
+| `pnpm start`   | Start the app in development mode |
+| `pnpm package` | Package the app for distribution  |
+| `pnpm make`    | Create distributable packages     |
+| `pnpm publish` | Publish the app                   |
+| `pnpm lint`    | Run ESLint to check code quality  |
 
 ## 🏗️ Tech Stack
 
@@ -148,12 +148,11 @@ This will create platform-specific distributables:
 
 ## 👨‍💻 Author
 
-KevinComba  
-Email: <kelchospense88@gmail.com>
+KevinComba
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](./LICENSE).
 
 ## 🤝 Contributing
 
