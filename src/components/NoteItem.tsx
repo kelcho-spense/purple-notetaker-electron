@@ -1,31 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Note } from '@/types';
 import { formatDate } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 import { Trash2, Calendar } from 'lucide-react';
+import { useNotesStore } from '@/store';
 
 interface NoteItemProps {
     note: Note;
-    onDelete: (id: string) => void;
 }
 
-const NoteItem: React.FC<NoteItemProps> = ({ note, onDelete }) => {
-    const handleDelete = (e: React.MouseEvent): void => {
-        e.preventDefault();
-        e.stopPropagation();
+const NoteItem: React.FC<NoteItemProps> = ({ note }) => {
+    const { deleteNote } = useNotesStore();
+    const [isDeleting, setIsDeleting] = useState(false);
 
+    const handleDelete = async (): Promise<void> => {
         try {
-            if (window.confirm('Are you sure you want to delete this note?')) {
-                // Use setTimeout to ensure the confirm dialog is fully closed
-                setTimeout(() => {
-                    onDelete(note.id);
-                }, 0);
-            }
+            setIsDeleting(true);
+            await deleteNote(note.id);
         } catch (error) {
             console.error('Error deleting note:', error);
-            alert('Failed to delete note. Please try again.');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -36,15 +44,37 @@ const NoteItem: React.FC<NoteItemProps> = ({ note, onDelete }) => {
                     <CardTitle className="text-lg font-semibold text-foreground flex-1 line-clamp-2 group-hover:text-primary transition-colors">
                         {note.title}
                     </CardTitle>
-                    <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={handleDelete}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0"
-                        aria-label={`Delete note: ${note.title}`}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {/* delete alert */}
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0"
+                                aria-label={`Delete note: ${note.title}`}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Note</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to delete "{note.title}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={handleDelete}
+                                    disabled={isDeleting}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                    {isDeleting ? 'Deleting...' : 'Delete'}
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </div>
             </CardHeader>
             <CardContent className="pt-0">

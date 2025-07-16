@@ -1,15 +1,12 @@
 import React from 'react';
-import { Note } from '../types';
 import NoteItem from './NoteItem';
 import { Card, CardContent } from './ui/card';
 import { FileText, Plus } from 'lucide-react';
+import { useNotes } from '@/store';
 
-interface NotesListProps {
-    notes: Note[];
-    onDeleteNote: (id: string) => void;
-}
+const NotesList: React.FC = () => {
+    const notes = useNotes();
 
-const NotesList: React.FC<NotesListProps> = ({ notes, onDeleteNote }) => {
     if (notes.length === 0) {
         return (
             <Card className="bg-muted/50 border-dashed border-2 border-muted-foreground/25">
@@ -34,7 +31,6 @@ const NotesList: React.FC<NotesListProps> = ({ notes, onDeleteNote }) => {
                 <NoteItem
                     key={note.id}
                     note={note}
-                    onDelete={onDeleteNote}
                 />
             ))}
         </div>

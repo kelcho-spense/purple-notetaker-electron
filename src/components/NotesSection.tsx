@@ -1,26 +1,14 @@
 import React from 'react';
-import { Note } from '@/types';
 import NotesList from './NotesList';
 import Loading from './Loading';
 import ErrorMessage from './ErrorMessage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useNotesStore } from '@/store';
 
-interface NotesSectionProps {
-    notes: Note[];
-    loading: boolean;
-    error: string | null;
-    onDeleteNote: (id: string) => void;
-    onRetry?: () => void;
-}
+const NotesSection: React.FC = () => {
+    const { notes, loading, error, loadNotes } = useNotesStore();
 
-const NotesSection: React.FC<NotesSectionProps> = ({
-    notes,
-    loading,
-    error,
-    onDeleteNote,
-    onRetry
-}) => {
     return (
         <Card className="backdrop-blur-sm bg-white/95 shadow-xl border-white/20">
             <CardHeader className="pb-4">
@@ -35,16 +23,13 @@ const NotesSection: React.FC<NotesSectionProps> = ({
             </CardHeader>
             <CardContent>
                 {error && (
-                    <ErrorMessage message={error} onRetry={onRetry} />
+                    <ErrorMessage message={error} onRetry={loadNotes} />
                 )}
 
                 {loading ? (
                     <Loading message="Loading your notes..." />
                 ) : (
-                    <NotesList
-                        notes={notes}
-                        onDeleteNote={onDeleteNote}
-                    />
+                    <NotesList />
                 )}
             </CardContent>
         </Card>

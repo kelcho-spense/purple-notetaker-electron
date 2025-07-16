@@ -1,9 +1,14 @@
-import React from 'react';
-import { useNotes } from '@/hooks';
+import React, { useEffect } from 'react';
 import { Header, NoteForm, NotesSection, LoadingScreen, CSPDebug } from '@/components';
+import { useNotesStore } from '@/store';
 
 const App: React.FC = () => {
-    const { notes, addNote, deleteNote, loading, error } = useNotes();
+    const { loading, loadNotes } = useNotesStore();
+
+    // Load notes when the app starts
+    useEffect(() => {
+        loadNotes();
+    }, [loadNotes]);
 
     // Show loading screen while notes are being loaded
     if (loading) {
@@ -19,13 +24,8 @@ const App: React.FC = () => {
                 <div className="max-w-4xl mx-auto px-4 py-8">
                     <Header />
                     <div className="space-y-8">
-                        <NoteForm onAddNote={addNote} />
-                        <NotesSection
-                            notes={notes}
-                            loading={loading}
-                            error={error}
-                            onDeleteNote={deleteNote}
-                        />
+                        <NoteForm />
+                        <NotesSection />
                     </div>
                 </div>
             </div>
