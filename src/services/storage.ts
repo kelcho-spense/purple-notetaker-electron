@@ -10,15 +10,43 @@ export class StorageService {
     static loadNotes(): Note[] {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (!saved) return [];
+            if (!saved || saved === 'null' || saved === 'undefined') {
+                return [];
+            }
 
             const parsedNotes = JSON.parse(saved);
-            return parsedNotes.map((note: { id: string, title: string, description: string, createdAt: string }) => ({
-                ...note,
-                createdAt: new Date(note.createdAt)
-            }));
+
+            // Validate that parsedNotes is an array
+            if (!Array.isArray(parsedNotes)) {
+                console.warn('Invalid notes data format, resetting to empty array');
+                this.clearNotes();
+                return [];
+            }
+
+            return parsedNotes.map((note: unknown) => {
+                // Validate note structure
+                if (!note || typeof note !== 'object') {
+                    console.warn('Invalid note structure detected, skipping:', note);
+                    return null;
+                }
+
+                const noteObj = note as Record<string, unknown>;
+                if (!noteObj.id || !noteObj.title || !noteObj.description) {
+                    console.warn('Invalid note structure detected, skipping:', note);
+                    return null;
+                }
+
+                return {
+                    id: String(noteObj.id),
+                    title: String(noteObj.title),
+                    description: String(noteObj.description),
+                    createdAt: new Date(String(noteObj.createdAt))
+                };
+            }).filter(note => note !== null) as Note[];
         } catch (error) {
             console.error('Error loading notes:', error);
+            // Clear corrupted data
+            this.clearNotes();
             return [];
         }
     }

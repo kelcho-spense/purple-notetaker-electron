@@ -38,14 +38,23 @@ export const useNoteForm = (): UseNoteFormReturn => {
     const handleSubmit = (onSubmit: (title: string, description: string) => void) =>
         (e: React.FormEvent): void => {
             e.preventDefault();
+            e.stopPropagation();
 
             if (!isValid) {
                 alert('Please fill in both title and description!');
                 return;
             }
 
-            onSubmit(formData.title, formData.description);
-            resetForm();
+            try {
+                // Use setTimeout to ensure form submission doesn't block UI
+                setTimeout(() => {
+                    onSubmit(formData.title, formData.description);
+                    resetForm();
+                }, 0);
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Failed to create note. Please try again.');
+            }
         };
 
     return {

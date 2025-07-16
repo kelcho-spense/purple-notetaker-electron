@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Note } from '../types';
-import { StorageService } from '../services';
+import { ElectronStorageService } from '../services';
 import { generateId } from '../utils';
 
 interface UseNotesReturn {
@@ -20,17 +20,15 @@ export const useNotes = (): UseNotesReturn => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Load notes from localStorage on mount
+    // Load notes from storage on mount
     useEffect(() => {
         const loadNotes = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                // Simulate async loading for better UX
-                await new Promise(resolve => setTimeout(resolve, 100));
-
-                const loadedNotes = StorageService.loadNotes();
+                // Load notes using the new storage service
+                const loadedNotes = await ElectronStorageService.loadNotes();
                 setNotes(loadedNotes);
             } catch (err) {
                 setError('Failed to load notes');
@@ -43,10 +41,17 @@ export const useNotes = (): UseNotesReturn => {
         loadNotes();
     }, []);
 
-    // Save notes to localStorage whenever notes change
+    // Save notes to storage whenever notes change
     useEffect(() => {
         if (!loading) {
-            StorageService.saveNotes(notes);
+            // Use setTimeout to avoid blocking the UI
+            setTimeout(async () => {
+                try {
+                    await ElectronStorageService.saveNotes(notes);
+                } catch (error) {
+                    console.error('Error saving notes:', error);
+                }
+            }, 0);
         }
     }, [notes, loading]);
 
@@ -78,7 +83,11 @@ export const useNotes = (): UseNotesReturn => {
      */
     const deleteNote = (id: string): void => {
         try {
-            setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
+            setNotes(prevNotes => {
+                const updatedNotes = prevNotes.filter(note => note.id !== id);
+                console.log('Deleted note:', id, 'Remaining notes:', updatedNotes.length);
+                return updatedNotes;
+            });
             setError(null);
         } catch (err) {
             setError('Failed to delete note');
