@@ -9,14 +9,23 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { ErrorBoundary } from './components';
 import './index.css';
 
+// Get the root element
 const container = document.getElementById('root');
 if (!container) {
-    throw new Error('Root element not found');
+    throw new Error('Root element not found. Make sure index.html contains a div with id="root"');
 }
 
+// Create root and render the app with error boundary
 const root = createRoot(container);
-root.render(<App />);
+root.render(
+    <React.StrictMode>
+        <ErrorBoundary>
+            <App />
+        </ErrorBoundary>
+    </React.StrictMode>
+);
 
 console.log('🎨 Purple Notes React app loaded successfully!');
